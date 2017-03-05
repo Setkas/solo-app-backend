@@ -3,8 +3,7 @@
 use Psr\Http\Message\ResponseInterface;
 
 function jsonResponse(ResponseInterface $response, $code = 200, array $data = null) {
-    $newResponse = $response
-        ->withStatus($code)
+    $newResponse = $response->withStatus($code)
         ->withHeader('Content-Type', 'application/json')
         ->withHeader('Access-Control-Allow-Origin', '*')
         ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
@@ -17,4 +16,6 @@ function jsonResponse(ResponseInterface $response, $code = 200, array $data = nu
     }
 }
 
-require_once("../src/routes/user/user-handler.php");
+//Register all route groups
+require_once("./src/routes/login/login-handler.php");
+require_once("./src/routes/user/user-handler.php");
