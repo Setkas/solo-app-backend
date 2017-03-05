@@ -20,7 +20,8 @@
         "phpmailer/phpmailer": "^5.2",
         "firebase/php-jwt": "^4.0",
         "fightbulc/moment": "*",
-        "respect/validation": "^1.1"
+        "respect/validation": "^1.1",
+        "blocktrail/cryptojs-aes-php": "^0.1.0"
     },
     "require-dev": {
         "phpunit/phpunit": ">=4.8 < 6.0"

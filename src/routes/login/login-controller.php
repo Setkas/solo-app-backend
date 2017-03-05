@@ -20,21 +20,22 @@ class loginController
                 'database_name' => Variables\MysqlCredentials::$Database,
                 'server' => Variables\MysqlCredentials::$Host,
                 'username' => Variables\MysqlCredentials::$User,
-                'password' => Variables\MysqlCredentials::$Password, 'charset' => 'utf8']);
+                'password' => Variables\MysqlCredentials::$Password,
+                'charset' => 'utf8']);
         } catch (Exception $exception) {
             return false;
         }
 
         $result = $db->select('practice', [
             "[>]user" => [
-                "id" => "id"
+                "id" => "practice_id"
             ]
         ], [
             "practice.id(id_practice)",
             "user.id(id_user)"
         ], [
             "practice.code[~]" => $practice,
-            "user.code[~]" => $user,
+            "user.code" => $user,
             "user.password[~]" => md5($password),
             "LIMIT" => [0, 1]
         ]);

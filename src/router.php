@@ -19,3 +19,4 @@ function jsonResponse(ResponseInterface $response, $code = 200, array $data = nu
 //Register all route groups
 require_once("./src/routes/login/login-handler.php");
 require_once("./src/routes/user/user-handler.php");
+require_once("./src/routes/practice/practice-handler.php");

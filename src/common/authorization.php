@@ -9,6 +9,18 @@ use Commons\Variables;
 
 class Auth {
     /**
+     * Authorization levels list
+     * @var array
+     */
+    private static $authLevels = [
+        "GUEST",
+        "CLIENT",
+        "USER",
+        "MODERATOR",
+        "ADMIN"
+    ];
+
+    /**
      * Creates authorization token for user
      * @param $practice
      * @param $user
@@ -35,7 +47,7 @@ class Auth {
     /**
      * Checks if token is valid
      * @param $token
-     * @return bool
+     * @return array|bool
      */
     public static function checkToken($token) {
         if (strpos($token, 'Bearer') !== false) {
@@ -66,7 +78,7 @@ class Auth {
 
         $result = $db->select('practice', [
             "[>]user" => [
-                "id" => "id"
+                "id" => "practice_id"
             ]
         ], [
             "practice.id(id_practice)",
@@ -81,6 +93,13 @@ class Auth {
             return false;
         }
 
-        return true;
+        return [
+            'user' => $tArray['user'],
+            'practice' => $tArray['practice']
+        ];
+    }
+
+    public static function defaultAuthorization() {
+        return self::$authLevels[2];
     }
 }

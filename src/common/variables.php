@@ -13,4 +13,6 @@ class MysqlCredentials {
 
 class LockKeys {
     public static $Jwt = "PuC2FdHUtWGpxglVfe73";
+
+    public static $Mysql = "m8w545MWTsEFuZy1Ns4d";
 }
