@@ -1,7 +1,8 @@
 <?php
 
 use Medoo\Medoo;
-use \Commons\Authorization\Auth;
+use Moment\Moment;
+use Commons\Authorization\Auth;
 use Commons\Variables;
 
 class loginController
@@ -26,7 +27,8 @@ class loginController
             ]
         ], [
             "practice.id(id_practice)",
-            "user.id(id_user)"
+            "user.id(id_user)",
+            "valid"
         ], [
             "practice.code[~]" => $practice,
             "user.code" => $user,
@@ -41,6 +43,12 @@ class loginController
 
         if (!$result || count($result) === 0) {
             return false;
+        }
+
+        $valid = new Moment($result[0]["valid"]);
+
+        if($valid->fromNow()->getDirection() === 'past') {
+            return null;
         }
 
         return Auth::createToken($result[0]["id_practice"], $result[0]["id_user"]);

@@ -183,7 +183,7 @@ class practiceController
         $result = $db->insert('user', [
             'practice_id' => $practiceId,
             'position_id' => $encodedData['position_id'],
-            'code' => 0,
+            'code' => 1,
             'password' => md5($encodedData['password']),
             'e_title' => $encodedData['e_title'],
             'e_name' => $encodedData['e_name'],

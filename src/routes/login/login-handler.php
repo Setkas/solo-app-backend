@@ -30,11 +30,10 @@ $app->post('/login', function (ServerRequestInterface $request, ResponseInterfac
     $lc = new loginController();
     $result = $lc->login($params['practice'], $params['user'], $params['password']);
 
-    if ($result === false) {
-        return jsonResponse($response, 400, [
-            "code" => 400,
-            "message" => "INVALID_LOGIN_DETAILS"
-        ]);
+    if($result === false) {
+        return jsonResponse($response, 400, ["code" => 400, "message" => "INVALID_LOGIN_DETAILS"]);
+    } else if ($result === null) {
+        return jsonResponse($response, 401, ["code" => 401, "message" => "PRACTICE_VALIDITY_EXPIRED"]);
     }
 
     return jsonResponse($response, 200, $result);
