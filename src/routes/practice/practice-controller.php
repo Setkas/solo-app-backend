@@ -1,10 +1,9 @@
 <?php
+require_once("./src/routes/user/user-handler.php");
 
 use Medoo\Medoo;
 use Moment\Moment;
 use Commons\MysqlLock;
-use Commons\Variables;
-use Commons\Authorization\Auth;
 
 class practiceController
 {
@@ -17,10 +16,7 @@ class practiceController
         'phone',
         'contact_email',
         'system_email',
-        'webpages',
-        'title',
-        'name',
-        'surname'
+        'webpages'
     ];
 
     /**
@@ -43,6 +39,7 @@ class practiceController
 
         $result = $db->select('practice', "*", [
             "id" => $practiceId,
+            "deleted" => 0,
             "LIMIT" => [
                 0,
                 1
@@ -147,6 +144,10 @@ class practiceController
             return false;
         }
 
+        if (!isset($data['webpages'])) {
+            $data['webpages'] = "";
+        }
+
         $encodedData = $this->encodeData($data);
 
         if ($this->practiceExists($db, $encodedData['company'])) {
@@ -180,17 +181,16 @@ class practiceController
 
         $practiceId = $db->id();
 
-        $result = $db->insert('user', [
-            'practice_id' => $practiceId,
-            'position_id' => $encodedData['position_id'],
-            'code' => 1,
-            'password' => md5($encodedData['password']),
-            'e_title' => $encodedData['e_title'],
-            'e_name' => $encodedData['e_name'],
-            'e_surname' => $encodedData['e_surname'],
-            'gender' => $encodedData['gender'],
-            'authorization' => Auth::defaultAuthorization()
-        ]);
+        $uc = new userController();
+
+        $result = $uc->newUser($practiceId, [
+            'position_id' => $data['position_id'],
+            'password' => md5($data['password']),
+            'title' => $data['title'],
+            'name' => $data['name'],
+            'surname' => $data['surname'],
+            'gender' => $data['gender']
+        ], $db, true);
 
         if ($result === false) {
             $db->delete('practice', [
@@ -247,7 +247,8 @@ class practiceController
         }
 
         $result = $db->update('practice', $editData, [
-            'id' => $id
+            'id' => $id,
+            'deleted' => 0
         ]);
 
         return ($result !== false);
@@ -255,20 +256,27 @@ class practiceController
 
     /**
      * Deletes single practice
-     * @param $id
+     * @param $practiceId
+     * @param $userId
      * @return bool
      */
-    public function deletePractice($id) {
+    public function deletePractice($practiceId, $userId) {
         $db = databaseConnect();
 
         if ($db === false) {
             return false;
         }
 
+        $uc = new userController();
+
+        if (!$uc->isMasterUser($userId)) {
+            return false;
+        }
+
         $result = $db->update('practice', [
             'deleted' => 1
         ], [
-            'id' => $id
+            'id' => $practiceId
         ]);
 
         return ($result !== false);

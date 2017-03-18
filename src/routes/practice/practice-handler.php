@@ -63,15 +63,7 @@ $app->patch('/practice', function (ServerRequestInterface $request, ResponseInte
         ->key('phone', Validator::stringType(), false)
         ->key('contact_email', Validator::email(), false)
         ->key('webpages', Validator::url(), false)
-        ->key('language_id', Validator::numeric(), false)
-        ->key('password', Validator::regex('/^([a-zA-Z0-9]{8,30})$/'), false)
-        ->key('title', Validator::stringType(), false)
-        ->key('name', Validator::stringType(), false)
-        ->key('surname', Validator::stringType(), false)
-        ->key('position_id', Validator::numeric()
-            ->length(1, 9), false)
-        ->key('gender', Validator::stringType()
-            ->length(1), false);
+        ->key('language_id', Validator::numeric(), false);
 
     if (!$practiceValidator->validate($params)) {
         return jsonResponse($response, 400, [
@@ -106,7 +98,7 @@ $app->post('/practice', function (ServerRequestInterface $request, ResponseInter
         ->key('webpages', Validator::url(), false)
         ->key('language_id', Validator::numeric())
         ->key('password', Validator::regex('/^([a-zA-Z0-9]{8,30})$/'))
-        ->key('title', Validator::stringType())
+        ->key('title', Validator::stringType(), false)
         ->key('name', Validator::stringType())
         ->key('surname', Validator::stringType())
         ->key('position_id', Validator::numeric()
@@ -158,7 +150,7 @@ $app->delete('/practice', function (ServerRequestInterface $request, ResponseInt
 
     $pc = new practiceController();
 
-    if (!$pc->deletePractice($auth['practice'])) {
+    if (!$pc->deletePractice($auth['practice'], $auth['user'])) {
         return jsonResponse($response, 500, [
             'code' => 500,
             'message' => 'PRACTICE_DELETE_ERROR'

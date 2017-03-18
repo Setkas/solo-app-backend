@@ -12,7 +12,7 @@ function jsonResponse(ResponseInterface $response, $code = 200, array $data = nu
     if ($data === null) {
         return $newResponse;
     } else {
-        return $newResponse->write(json_encode($data));
+        return $newResponse->write(json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 }
 
@@ -22,3 +22,4 @@ require_once("./src/routes/user/user-handler.php");
 require_once("./src/routes/practice/practice-handler.php");
 require_once("./src/routes/language/language-handler.php");
 require_once("./src/routes/position/position-handler.php");
+require_once("./src/routes/client/client-handler.php");
