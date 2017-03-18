@@ -12,24 +12,21 @@ class userController
      * @return bool|mixed
      */
     public function loadUser($userId) {
-        try {
-            $db = new Medoo([
-                'database_type' => 'mysql',
-                'database_name' => Variables\MysqlCredentials::$Database,
-                'server' => Variables\MysqlCredentials::$Host,
-                'username' => Variables\MysqlCredentials::$User,
-                'password' => Variables\MysqlCredentials::$Password,
-                'charset' => 'utf8']);
-        } catch (Exception $exception) {
+        $db = databaseConnect();
+
+        if ($db === false) {
             return false;
         }
 
         $result = $db->select('user', "*", [
             "id" => $userId,
-            "LIMIT" => [0, 1]
+            "LIMIT" => [
+                0,
+                1
+            ]
         ]);
 
-        if($result === false || count($result) === 0) {
+        if ($result === false || count($result) === 0) {
             return false;
         }
 

@@ -65,14 +65,9 @@ class Auth {
             return false;
         }
 
-        try {
-            $db = new Medoo([
-                'database_type' => 'mysql',
-                'database_name' => Variables\MysqlCredentials::$Database,
-                'server' => Variables\MysqlCredentials::$Host,
-                'username' => Variables\MysqlCredentials::$User,
-                'password' => Variables\MysqlCredentials::$Password, 'charset' => 'utf8']);
-        } catch (Exception $exception) {
+        $db = databaseConnect();
+
+        if($db === false) {
             return false;
         }
 
@@ -86,6 +81,8 @@ class Auth {
         ], [
             "practice.id" => $tArray['practice'],
             "user.id" => $tArray['user'],
+            "practice.deleted" => 0,
+            "user.deleted" => 0,
             "LIMIT" => [0, 1]
         ]);
 
