@@ -47,7 +47,9 @@ class loginController
 
         $valid = new Moment($result[0]["valid"]);
 
-        if($valid->fromNow()->getDirection() === 'past') {
+        if ($valid->fromNow()
+                ->getDirection() === 'past'
+        ) {
             return null;
         }
 

@@ -13,9 +13,9 @@ class MysqlLock
      * @return mixed
      */
     public static function EncodeRow($row) {
-        foreach($row as $key => $column) {
-            if(substr($key, 0, 2) === 'e_') {
-                if(strlen($column) > 0) {
+        foreach ($row as $key => $column) {
+            if (substr($key, 0, 2) === 'e_') {
+                if (strlen($column) > 0) {
                     $row[$key] = CryptoJSAES::encrypt($column, Variables\LockKeys::$Mysql);
                 } else {
                     $row[$key] = $column;
@@ -32,9 +32,9 @@ class MysqlLock
      * @return mixed
      */
     public static function DecodeRow($row) {
-        foreach($row as $key => $column) {
-            if(substr($key, 0, 2) === 'e_') {
-                if(strlen($column) > 0) {
+        foreach ($row as $key => $column) {
+            if (substr($key, 0, 2) === 'e_') {
+                if (strlen($column) > 0) {
                     $row[substr($key, 2)] = CryptoJSAES::decrypt($column, Variables\LockKeys::$Mysql);
                 } else {
                     $row[substr($key, 2)] = $column;
@@ -53,11 +53,11 @@ class MysqlLock
      * @return array
      */
     public static function EncodeBatch($batch) {
-        if(!is_array($batch)) {
+        if (!is_array($batch)) {
             return $batch;
         }
 
-        foreach($batch as $key => $row) {
+        foreach ($batch as $key => $row) {
             $batch[$key] = self::EncodeRow($row);
         }
 
@@ -70,11 +70,11 @@ class MysqlLock
      * @return array
      */
     public static function DecodeBatch($batch) {
-        if(!is_array($batch)) {
+        if (!is_array($batch)) {
             return $batch;
         }
 
-        foreach($batch as $key => $row) {
+        foreach ($batch as $key => $row) {
             $batch[$key] = self::DecodeRow($row);
         }
 

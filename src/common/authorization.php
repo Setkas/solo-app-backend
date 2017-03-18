@@ -7,7 +7,8 @@ use Moment\Moment;
 use Firebase\JWT\JWT;
 use Commons\Variables;
 
-class Auth {
+class Auth
+{
     /**
      * Authorization levels list
      * @var array
@@ -28,7 +29,8 @@ class Auth {
      */
     public static function createToken($practice, $user) {
         $moment = new Moment();
-        $expireTime = $moment->addDays(1)->format();
+        $expireTime = $moment->addDays(1)
+            ->format();
 
         $token = [
             "practice" => $practice,
@@ -59,15 +61,16 @@ class Auth {
         $tArray = json_decode(json_encode($decoded), true);
 
         $expire = new Moment($tArray['expire']);
-        $diff = $expire->fromNow()->getDirection();
+        $diff = $expire->fromNow()
+            ->getDirection();
 
-        if($diff === 'past') {
+        if ($diff === 'past') {
             return false;
         }
 
         $db = databaseConnect();
 
-        if($db === false) {
+        if ($db === false) {
             return false;
         }
 
@@ -83,10 +86,13 @@ class Auth {
             "user.id" => $tArray['user'],
             "practice.deleted" => 0,
             "user.deleted" => 0,
-            "LIMIT" => [0, 1]
+            "LIMIT" => [
+                0,
+                1
+            ]
         ]);
 
-        if(!$result || count($result) === 0) {
+        if (!$result || count($result) === 0) {
             return false;
         }
 
