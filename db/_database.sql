@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Počítač: 127.0.0.1
--- Vytvořeno: Ned 19. bře 2017, 01:49
+-- Vytvořeno: Ned 19. bře 2017, 22:33
 -- Verze serveru: 10.1.21-MariaDB
 -- Verze PHP: 5.6.30
 
@@ -21,6 +21,8 @@ SET time_zone = "+00:00";
 --
 -- Databáze: `soloapp`
 --
+CREATE DATABASE IF NOT EXISTS `soloapp` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `soloapp`;
 
 -- --------------------------------------------------------
 
@@ -32,6 +34,7 @@ DROP TABLE IF EXISTS `client`;
 CREATE TABLE `client` (
   `id` int(9) NOT NULL,
   `practice_id` int(9) NOT NULL,
+  `import_id` int(9) DEFAULT NULL,
   `keywords` varchar(50) NOT NULL,
   `e_name` blob NOT NULL,
   `e_surname` blob NOT NULL,
@@ -44,12 +47,6 @@ CREATE TABLE `client` (
   `changes_reminder` varchar(25) DEFAULT NULL,
   `deleted` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- RELACE PRO TABULKU `client`:
---   `practice_id`
---       `practice` -> `id`
---
 
 -- --------------------------------------------------------
 
@@ -65,10 +62,6 @@ CREATE TABLE `language` (
   `string` varchar(50) NOT NULL,
   `locales` text COMMENT 'JSON array with list of locale identifiers'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- RELACE PRO TABULKU `language`:
---
 
 --
 -- Vypisuji data pro tabulku `language`
@@ -93,10 +86,6 @@ CREATE TABLE `position` (
   `position` varchar(50) NOT NULL,
   `language_ids` text NOT NULL COMMENT 'JSON array of language ids'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- RELACE PRO TABULKU `position`:
---
 
 --
 -- Vypisuji data pro tabulku `position`
@@ -134,12 +123,6 @@ CREATE TABLE `practice` (
   `deleted` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 
---
--- RELACE PRO TABULKU `practice`:
---   `language_id`
---       `language` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
@@ -154,12 +137,6 @@ CREATE TABLE `setup` (
   `value` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- RELACE PRO TABULKU `setup`:
---   `user_id`
---       `user` -> `id`
---
-
 -- --------------------------------------------------------
 
 --
@@ -170,7 +147,7 @@ DROP TABLE IF EXISTS `term`;
 CREATE TABLE `term` (
   `id` int(9) NOT NULL,
   `client_id` int(9) NOT NULL,
-  `user_id` int(9) NOT NULL,
+  `user_id` int(9) DEFAULT NULL,
   `date` varchar(25) NOT NULL,
   `next_date` varchar(25) NOT NULL,
   `note` text NOT NULL,
@@ -188,14 +165,6 @@ CREATE TABLE `term` (
   `pass_lower` varchar(15) NOT NULL,
   `tartar` varchar(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
-
---
--- RELACE PRO TABULKU `term`:
---   `user_id`
---       `user` -> `id`
---   `client_id`
---       `client` -> `id`
---
 
 -- --------------------------------------------------------
 
@@ -218,14 +187,6 @@ CREATE TABLE `user` (
   `reset_password` tinyint(1) NOT NULL DEFAULT '0',
   `deleted` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- RELACE PRO TABULKU `user`:
---   `practice_id`
---       `practice` -> `id`
---   `position_id`
---       `position` -> `id`
---
 
 --
 -- Klíče pro exportované tabulky
@@ -291,7 +252,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT pro tabulku `client`
 --
 ALTER TABLE `client`
-  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT pro tabulku `language`
 --
@@ -306,7 +267,7 @@ ALTER TABLE `position`
 -- AUTO_INCREMENT pro tabulku `practice`
 --
 ALTER TABLE `practice`
-  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 --
 -- AUTO_INCREMENT pro tabulku `setup`
 --
@@ -316,12 +277,12 @@ ALTER TABLE `setup`
 -- AUTO_INCREMENT pro tabulku `term`
 --
 ALTER TABLE `term`
-  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT pro tabulku `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 --
 -- Omezení pro exportované tabulky
 --

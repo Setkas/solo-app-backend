@@ -32,3 +32,4 @@ require_once("./src/routes/position/position-handler.php");
 require_once("./src/routes/client/client-handler.php");
 require_once("./src/routes/setup/setup-handler.php");
 require_once("./src/routes/term/term-handler.php");
+require_once("./src/routes/import/import-handler.php");
