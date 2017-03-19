@@ -2,6 +2,13 @@
 
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Creates JSON response from services
+ * @param ResponseInterface $response
+ * @param int $code
+ * @param array|null $data
+ * @return mixed
+ */
 function jsonResponse(ResponseInterface $response, $code = 200, array $data = null) {
     $newResponse = $response->withStatus($code)
         ->withHeader('Content-Type', 'application/json')

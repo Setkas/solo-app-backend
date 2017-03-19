@@ -1,7 +1,5 @@
 <?php
 
-use Commons\Authorization\Auth;
-use Medoo\Medoo;
 use Commons\MysqlLock;
 
 class clientController
@@ -217,6 +215,12 @@ class clientController
         return ($result !== false);
     }
 
+    /**
+     * Deletes single client
+     * @param $practiceId
+     * @param $userId
+     * @return bool
+     */
     public function deleteClient($practiceId, $userId) {
         $db = databaseConnect();
 

@@ -1,8 +1,7 @@
 <?php
+
 namespace Commons\Authorization;
 
-use Exception;
-use Medoo\Medoo;
 use Moment\Moment;
 use Firebase\JWT\JWT;
 use Commons\Variables;
@@ -102,6 +101,10 @@ class Auth
         ];
     }
 
+    /**
+     * Gets default authorization for users
+     * @return mixed
+     */
     public static function defaultAuthorization() {
         return self::$authLevels[2];
     }

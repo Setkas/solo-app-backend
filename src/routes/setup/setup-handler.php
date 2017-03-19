@@ -5,7 +5,6 @@ require_once("setup-controller.php");
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use \Commons\Authorization\Auth;
-use Respect\Validation\Validator;
 
 $app->get('/setup', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
     if (!$request->hasHeader('Authorization')) {

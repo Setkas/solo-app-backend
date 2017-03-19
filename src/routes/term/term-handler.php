@@ -5,7 +5,6 @@ require_once("term-controller.php");
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use \Commons\Authorization\Auth;
-use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator;
 
 $app->get('/term/{clientId}/{id}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {

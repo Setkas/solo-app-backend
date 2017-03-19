@@ -35,11 +35,13 @@ $app->post('/login', function (ServerRequestInterface $request, ResponseInterfac
             "code" => 400,
             "message" => "INVALID_LOGIN_DETAILS"
         ]);
-    } else if ($result === null) {
-        return jsonResponse($response, 401, [
-            "code" => 401,
-            "message" => "PRACTICE_VALIDITY_EXPIRED"
-        ]);
+    } else {
+        if ($result === null) {
+            return jsonResponse($response, 401, [
+                "code" => 401,
+                "message" => "PRACTICE_VALIDITY_EXPIRED"
+            ]);
+        }
     }
 
     return jsonResponse($response, 200, $result);

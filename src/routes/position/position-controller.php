@@ -1,8 +1,6 @@
 <?php
 
-use Medoo\Medoo;
 use Commons\MysqlLock;
-use Commons\Variables;
 
 class positionController
 {

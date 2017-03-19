@@ -1,8 +1,6 @@
 <?php
 
-use Commons\Authorization\Auth;
 use Medoo\Medoo;
-use Commons\MysqlLock;
 
 class setupController
 {

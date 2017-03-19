@@ -4,7 +4,6 @@ require_once("position-controller.php");
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use \Commons\Authorization\Auth;
 use Respect\Validation\Validator;
 
 $app->get('/position[/{id}]', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
