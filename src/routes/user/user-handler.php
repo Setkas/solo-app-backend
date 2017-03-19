@@ -180,6 +180,10 @@ $app->patch('/user', function (ServerRequestInterface $request, ResponseInterfac
         ]);
     }
 
+    if (isset($params["reset_password"])) {
+        //@TODO: Send email about password reset
+    }
+
     return jsonResponse($response, 200, [
         'code' => 200,
         'message' => 'USER_EDIT_SUCCESS'
