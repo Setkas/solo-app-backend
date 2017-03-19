@@ -279,3 +279,47 @@ $app->get('/term-image/{clientId}/{id}',
             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
             ->write($image);
     });
+
+$app->post('/term-email/{clientId}/{id}',
+    function (ServerRequestInterface $request, ResponseInterface $response, $args) {
+        if (!Validator::numeric()
+                ->length(1, 9)
+                ->validate($args['id']) || !Validator::numeric()
+                ->length(1, 9)
+                ->validate($args['clientId'])
+        ) {
+            return jsonResponse($response, 400, [
+                "code" => 400,
+                "message" => "INVALID_PARAMETERS_PROVIDED"
+            ]);
+        }
+
+        $cc = new clientController();
+
+        $client = $cc->getClientName($args['clientId']);
+
+        if ($client === false || $client["email"] === null || strlen($client["email"]) === 0) {
+            return jsonResponse($response, 400, [
+                "code" => 400,
+                "message" => "INVALID_CLIENT_PROVIDED"
+            ]);
+        }
+
+        $tc = new termController();
+
+        $image = $tc->generateImage($args['clientId'], $args['id'], $client);
+
+        if ($image === false) {
+            return jsonResponse($response, 500, [
+                'code' => 500,
+                'message' => 'TERM_EMAIL_FAILED'
+            ]);
+        }
+
+        //@TODO: Send email with image to client
+
+        return jsonResponse($response, 200, [
+            'code' => 200,
+            'message' => 'TERM_EMAIL_SENT'
+        ]);
+    });
