@@ -245,4 +245,40 @@ class userController
 
         return ($result !== false);
     }
+
+    /**
+     * Gets single user name and surname
+     * @param $userId
+     * @param Medoo|null $db
+     * @return array|bool
+     */
+    public function getUserName($userId, Medoo $db = null) {
+        if ($db === null) {
+            $db = databaseConnect();
+
+            if ($db === false) {
+                return false;
+            }
+        }
+
+        $result = $db->select('user', "*", [
+            "id" => $userId,
+            "LIMIT" => [
+                0,
+                1
+            ]
+        ]);
+
+        if ($result === false || count($result) === 0) {
+            return false;
+        }
+
+        $user = MysqlLock\MysqlLock::DecodeRow($result[0]);
+
+        return [
+            "title" => $user["title"],
+            "name" => $user["name"],
+            "surname" => $user["surname"]
+        ];
+    }
 }

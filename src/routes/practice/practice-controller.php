@@ -1,5 +1,5 @@
 <?php
-require_once("./src/routes/user/user-handler.php");
+require_once("./src/routes/user/user-controller.php");
 
 use Medoo\Medoo;
 use Moment\Moment;
