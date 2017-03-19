@@ -2,6 +2,7 @@
 
 namespace Commons\Authorization;
 
+use Exception;
 use Moment\Moment;
 use Firebase\JWT\JWT;
 use Commons\Variables;
@@ -55,7 +56,11 @@ class Auth
             $token = str_replace('Bearer ', '', $token);
         }
 
-        $decoded = JWT::decode($token, Variables\LockKeys::$Jwt, ['HS256']);
+        try {
+            $decoded = JWT::decode($token, Variables\LockKeys::$Jwt, ['HS256']);
+        } catch (Exception $e) {
+            return false;
+        }
 
         $tArray = json_decode(json_encode($decoded), true);
 

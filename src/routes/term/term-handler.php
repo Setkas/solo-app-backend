@@ -1,6 +1,7 @@
 <?php
 
 require_once("term-controller.php");
+require_once("./src/routes/client/client-controller.php");
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -240,3 +241,41 @@ $app->patch('/term/{clientId}/{id}', function (ServerRequestInterface $request, 
         'message' => 'TERM_EDIT_SUCCESS'
     ]);
 });
+
+$app->get('/term-image/{clientId}/{id}',
+    function (ServerRequestInterface $request, ResponseInterface $response, $args) {
+        if (!Validator::numeric()
+                ->length(1, 9)
+                ->validate($args['id']) || !Validator::numeric()
+                ->length(1, 9)
+                ->validate($args['clientId'])
+        ) {
+            $handler = $this->notFoundHandler;
+            return $handler($request, $response);
+        }
+
+        $cc = new clientController();
+
+        $client = $cc->getClientName($args['clientId']);
+
+        if ($client === false) {
+            $handler = $this->notFoundHandler;
+            return $handler($request, $response);
+        }
+
+        $tc = new termController();
+
+        $image = $tc->generateImage($args['clientId'], $args['id'], $client);
+
+        if ($image === false) {
+            $handler = $this->notFoundHandler;
+            return $handler($request, $response);
+        }
+
+        return $response->withHeader('Content-Type', 'image/png')
+            ->withHeader('Access-Control-Allow-Origin', '*')
+            ->withHeader('Access-Control-Allow-Headers',
+                'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            ->write($image);
+    });

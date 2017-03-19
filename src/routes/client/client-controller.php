@@ -237,4 +237,38 @@ class clientController
 
         return ($result !== false);
     }
+
+    /**
+     * gets client basic information
+     * @param $clientId
+     * @return array|bool
+     */
+    public function getClientName($clientId) {
+        $db = databaseConnect();
+
+        if ($db === false) {
+            return false;
+        }
+
+        $result = $db->select('client', "*", [
+            "id" => $clientId,
+            "LIMIT" => [
+                0,
+                1
+            ]
+        ]);
+
+        if ($result === false || count($result) === 0) {
+            return false;
+        }
+
+        $client = MysqlLock\MysqlLock::DecodeRow($result[0]);
+
+        return [
+            "name" => $client["name"],
+            "surname" => $client["surname"],
+            "birth_date" => $client["birth_date"],
+            "email" => $client["email"]
+        ];
+    }
 }

@@ -2,9 +2,12 @@
 
 require_once("user-controller.php");
 
+use Firebase\JWT\JWT;
+use Moment\Moment;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use \Commons\Authorization\Auth;
+use \Commons\Variables;
 use Respect\Validation\Validator;
 
 $app->get('/user', function (ServerRequestInterface $request, ResponseInterface $response) {
@@ -180,10 +183,6 @@ $app->patch('/user', function (ServerRequestInterface $request, ResponseInterfac
         ]);
     }
 
-    if (isset($params["reset_password"])) {
-        //@TODO: Send email about password reset
-    }
-
     return jsonResponse($response, 200, [
         'code' => 200,
         'message' => 'USER_EDIT_SUCCESS'
@@ -191,6 +190,55 @@ $app->patch('/user', function (ServerRequestInterface $request, ResponseInterfac
 });
 
 $app->delete('/user/{id}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
+    if (!$request->hasHeader('Authorization')) {
+        return jsonResponse($response, 401, [
+            'code' => 401,
+            'message' => 'INVALID_ACCESS'
+        ]);
+    }
+
+    $auth = Auth::checkToken($request->getHeader('Authorization')[0]);
+
+    if (!$auth) {
+        return jsonResponse($response, 401, [
+            'code' => 401,
+            'message' => 'ACCESS_TOKEN_INVALID'
+        ]);
+    }
+
+    if (!Validator::numeric()
+        ->length(1, 9)
+        ->validate($args['id'])
+    ) {
+        return jsonResponse($response, 400, [
+            "code" => 400,
+            "message" => "INVALID_PARAMETERS_PROVIDED"
+        ]);
+    }
+
+    $uc = new userController();
+
+    if (!$uc->isMasterUser($auth['user']) || $uc->isMasterUser($args['id'])) {
+        return jsonResponse($response, 401, [
+            'code' => 401,
+            'message' => 'ACTION_NOT_PERMITTED'
+        ]);
+    }
+
+    if (!$uc->deleteUser($auth['practice'], $args['id'])) {
+        return jsonResponse($response, 500, [
+            'code' => 500,
+            'message' => 'USER_DELETE_ERROR'
+        ]);
+    }
+
+    return jsonResponse($response, 200, [
+        'code' => 200,
+        'message' => 'USER_DELETED'
+    ]);
+});
+
+$app->get('/user/{id}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
     if (!$request->hasHeader('Authorization')) {
         return jsonResponse($response, 401, [
             'code' => 401,
