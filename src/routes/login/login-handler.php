@@ -16,9 +16,8 @@ $app->post('/login', function (ServerRequestInterface $request, ResponseInterfac
     $loginValidator = Validator::key('practice', Validator::stringType()
         ->length(1, 10)
         ->noWhitespace())
-        ->key('user', Validator::stringType()
-            ->length(1, 9)
-            ->noWhitespace())
+        ->key('user', Validator::numeric()
+            ->length(1, 9))
         ->key('password', Validator::stringType()
             ->length(1, 255)
             ->noWhitespace());

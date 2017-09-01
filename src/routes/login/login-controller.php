@@ -32,9 +32,9 @@ class loginController
         ], [
             "practice.code[~]" => $practice,
             "user.code" => $user,
-            "user.password[~]" => md5($password),
-            "practice.deleted" => 0,
-            "user.deleted" => 0,
+            "user.password" => md5($password),
+            "practice.deleted" => null,
+            "user.deleted" => null,
             "LIMIT" => [
                 0,
                 1
