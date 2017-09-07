@@ -6,6 +6,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use \Commons\Authorization\Auth;
 use Respect\Validation\Validator;
+use Respect\Validation\Exceptions\NestedValidationException;
 
 $app->get('/practice', function (ServerRequestInterface $request, ResponseInterface $response) {
     if (!$request->hasHeader('Authorization')) {
@@ -97,7 +98,7 @@ $app->post('/practice', function (ServerRequestInterface $request, ResponseInter
         ->key('contact_email', Validator::email())
         ->key('webpages', Validator::url(), false)
         ->key('language_id', Validator::numeric())
-        ->key('password', Validator::regex('/^([a-zA-Z0-9]{8,30})$/'))
+        ->key('password', Validator::regex('/^([a-zA-Z0-9]{6,30})$/'))
         ->key('title', Validator::stringType(), false)
         ->key('name', Validator::stringType())
         ->key('surname', Validator::stringType())

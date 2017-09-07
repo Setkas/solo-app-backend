@@ -80,8 +80,8 @@ class loginController
         ], [
             "practice.code[~]" => $practice,
             "user.code" => $user,
-            "practice.deleted" => 0,
-            "user.deleted" => 0,
+            "practice.deleted" => null,
+            "user.deleted" => null,
             "user.reset_password" => 0,
             "LIMIT" => [
                 0,
@@ -183,8 +183,8 @@ class loginController
         ], [
             "practice.id" => $tArray['practice'],
             "user.id" => $tArray['user'],
-            "practice.deleted" => 0,
-            "user.deleted" => 0,
+            "practice.deleted" => null,
+            "user.deleted" => null,
             "user.reset_password" => 1,
             "LIMIT" => [
                 0,
@@ -198,7 +198,7 @@ class loginController
 
         $result = $db->update('user', [
             "password" => md5($password),
-            "reset_password" => false
+            "reset_password" => 0
         ], [
             "id" => $tArray['user'],
             "practice_id" => $tArray['practice']

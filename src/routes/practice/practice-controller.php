@@ -148,6 +148,10 @@ class practiceController
             $data['webpages'] = "";
         }
 
+        if (!isset($data['title'])) {
+            $data['title'] = "";
+        }
+
         $encodedData = $this->encodeData($data);
 
         if ($this->practiceExists($db, $encodedData['company'])) {
@@ -185,7 +189,7 @@ class practiceController
 
         $result = $uc->newUser($practiceId, [
             'position_id' => $data['position_id'],
-            'password' => md5($data['password']),
+            'password' => $data['password'],
             'title' => $data['title'],
             'name' => $data['name'],
             'surname' => $data['surname'],

@@ -100,7 +100,7 @@ $app->post('/user', function (ServerRequestInterface $request, ResponseInterface
 
     $userValidator = Validator::key('position_id', Validator::numeric()
         ->length(1, 9))
-        ->key('password', Validator::regex('/^([a-zA-Z0-9]{8,30})$/'))
+        ->key('password', Validator::regex('/^([a-zA-Z0-9]{6,30})$/'))
         ->key('title', Validator::stringType(), false)
         ->key('name', Validator::stringType())
         ->key('surname', Validator::stringType())
@@ -159,7 +159,7 @@ $app->patch('/user', function (ServerRequestInterface $request, ResponseInterfac
 
     $userValidator = Validator::key('position_id', Validator::numeric()
         ->length(1, 9), false)
-        ->key('password', Validator::regex('/^([a-zA-Z0-9]{8,30})$/'), false)
+        ->key('password', Validator::regex('/^([a-zA-Z0-9]{6,30})$/'), false)
         ->key('title', Validator::stringType(), false)
         ->key('name', Validator::stringType(), false)
         ->key('surname', Validator::stringType(), false)

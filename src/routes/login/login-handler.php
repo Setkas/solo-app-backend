@@ -76,7 +76,7 @@ $app->post('/password-reset', function (ServerRequestInterface $request, Respons
     $params = $request->getParsedBody();
 
     $loginValidator = Validator::key('practice', Validator::stringType())
-        ->key('user', Validator::stringType())
+        ->key('user', Validator::numeric())
         ->key('url', Validator::url());
 
     if (!$loginValidator->validate($params)) {
@@ -106,15 +106,14 @@ $app->post('/password-reset', function (ServerRequestInterface $request, Respons
         ]);
     }
 
-    $resetUrl = $params['url'] . "token=" . $token['jwt'];
+    $resetUrl = $params['url'] . "#token=" . $token['jwt'];
 
     //@TODO: Send email about password reset
 
     return jsonResponse($response, 200, [
         'code' => 200,
         'message' => 'PASSWORD_RESET_SUCCESS',
-        'expire' => $token['expire'],
-        'token' => $token['jwt']
+        'data' => $resetUrl
     ]);
 });
 
@@ -122,7 +121,7 @@ $app->post('/password-update', function (ServerRequestInterface $request, Respon
     $params = $request->getParsedBody();
 
     $loginValidator = Validator::key('token', Validator::stringType())
-        ->key('password', Validator::regex('/^([a-zA-Z0-9]{8,30})$/'));
+        ->key('password', Validator::regex('/^([a-zA-Z0-9]{6,30})$/'));
 
     if (!$loginValidator->validate($params)) {
         return jsonResponse($response, 400, [
