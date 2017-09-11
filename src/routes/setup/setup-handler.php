@@ -7,65 +7,65 @@ use Psr\Http\Message\ServerRequestInterface;
 use \Commons\Authorization\Auth;
 
 $app->get('/setup', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
-    if (!$request->hasHeader('Authorization')) {
-        return jsonResponse($response, 401, [
-            'code' => 401,
-            'message' => 'INVALID_ACCESS'
-        ]);
-    }
+  if (!$request->hasHeader('Authorization')) {
+    return jsonResponse($response, 401, [
+      'code' => 401,
+      'message' => 'INVALID_ACCESS'
+    ]);
+  }
 
-    $auth = Auth::checkToken($request->getHeader('Authorization')[0]);
+  $auth = Auth::checkToken($request->getHeader('Authorization')[0]);
 
-    if (!$auth) {
-        return jsonResponse($response, 401, [
-            'code' => 401,
-            'message' => 'ACCESS_TOKEN_INVALID'
-        ]);
-    }
+  if (!$auth) {
+    return jsonResponse($response, 401, [
+      'code' => 401,
+      'message' => 'ACCESS_TOKEN_INVALID'
+    ]);
+  }
 
-    $sc = new setupController();
+  $sc = new setupController();
 
-    $setup = $sc->loadSetup($auth['user']);
+  $setup = $sc->loadSetup($auth['user']);
 
-    if ($setup === false) {
-        return jsonResponse($response, 200, []);
-    }
+  if ($setup === false) {
+    return jsonResponse($response, 200, []);
+  }
 
-    return jsonResponse($response, 200, $setup);
+  return jsonResponse($response, 200, $setup);
 });
 
 $app->patch('/setup', function (ServerRequestInterface $request, ResponseInterface $response) {
-    if (!$request->hasHeader('Authorization')) {
-        return jsonResponse($response, 401, [
-            'code' => 401,
-            'message' => 'INVALID_ACCESS'
-        ]);
-    }
-
-    $auth = Auth::checkToken($request->getHeader('Authorization')[0]);
-
-    if (!$auth) {
-        return jsonResponse($response, 401, [
-            'code' => 401,
-            'message' => 'ACCESS_TOKEN_INVALID'
-        ]);
-    }
-
-    $sc = new setupController();
-
-    $params = $request->getParsedBody();
-
-    $result = $sc->saveSetup($auth['user'], $params);
-
-    if ($result === false) {
-        return jsonResponse($response, 500, [
-            'code' => 500,
-            'message' => 'SETUP_UPDATE_FAILED'
-        ]);
-    }
-
-    return jsonResponse($response, 200, [
-        'code' => 200,
-        'message' => 'SETUP_SAVED'
+  if (!$request->hasHeader('Authorization')) {
+    return jsonResponse($response, 401, [
+      'code' => 401,
+      'message' => 'INVALID_ACCESS'
     ]);
+  }
+
+  $auth = Auth::checkToken($request->getHeader('Authorization')[0]);
+
+  if (!$auth) {
+    return jsonResponse($response, 401, [
+      'code' => 401,
+      'message' => 'ACCESS_TOKEN_INVALID'
+    ]);
+  }
+
+  $sc = new setupController();
+
+  $params = $request->getParsedBody();
+
+  $result = $sc->saveSetup($auth['user'], $params);
+
+  if ($result === false) {
+    return jsonResponse($response, 500, [
+      'code' => 500,
+      'message' => 'SETUP_UPDATE_FAILED'
+    ]);
+  }
+
+  return jsonResponse($response, 200, [
+    'code' => 200,
+    'message' => 'SETUP_SAVED'
+  ]);
 });

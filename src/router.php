@@ -5,49 +5,50 @@ use \Psr\Http\Message\RequestInterface;
 
 /**
  * Creates JSON response from services
+ *
  * @param ResponseInterface $response
  * @param int $code
  * @param array|null $data
  * @return mixed
  */
 function jsonResponse(ResponseInterface $response, $code = 200, array $data = null) {
-    $newResponse = $response->withStatus($code)
-                            ->withHeader('Content-Type', 'application/json')
-                            ->withHeader('Access-Control-Allow-Origin', '*')
-                            ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-                            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  $newResponse = $response->withStatus($code)
+    ->withHeader('Content-Type', 'application/json')
+    ->withHeader('Access-Control-Allow-Origin', '*')
+    ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+    ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
-    if ($data === null) {
-        return $newResponse;
-    } else {
-        return $newResponse->write(json_encode($data, JSON_UNESCAPED_UNICODE));
-    }
+  if ($data === null) {
+    return $newResponse;
+  } else {
+    return $newResponse->write(json_encode($data, JSON_UNESCAPED_UNICODE));
+  }
 }
 
 /**
  * Add CORS header for options requests
  */
 $app->add(function (RequestInterface $request, ResponseInterface $response, $next) {
-    $newResponse = $response->withHeader('Access-Control-Allow-Origin', '*')
-                            ->withHeader('Access-Control-Allow-Headers', array(
-                                'Content-Type',
-                                'X-Requested-With',
-                                'Authorization'
-                            ))
-                            ->withHeader('Access-Control-Allow-Methods', array(
-                                'GET',
-                                'POST',
-                                'PUT',
-                                'PATCH',
-                                'DELETE',
-                                'OPTIONS'
-                            ));
+  $newResponse = $response->withHeader('Access-Control-Allow-Origin', '*')
+    ->withHeader('Access-Control-Allow-Headers', [
+      'Content-Type',
+      'X-Requested-With',
+      'Authorization'
+    ])
+    ->withHeader('Access-Control-Allow-Methods', [
+      'GET',
+      'POST',
+      'PUT',
+      'PATCH',
+      'DELETE',
+      'OPTIONS'
+    ]);
 
-    if ($request->isOptions()) {
-        return $newResponse;
-    }
+  if ($request->isOptions()) {
+    return $newResponse;
+  }
 
-    return $next($request, $newResponse);
+  return $next($request, $newResponse);
 });
 
 //Register all route groups
