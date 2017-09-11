@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use \Commons\Authorization\Auth;
 use \Commons\Variables;
+use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator;
 
 $app->get('/user', function (ServerRequestInterface $request, ResponseInterface $response) {
@@ -108,9 +109,18 @@ $app->post('/user', function (ServerRequestInterface $request, ResponseInterface
             ->length(1));
 
     if (!$userValidator->validate($params)) {
+        $messages = [];
+
+        try {
+          $userValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 
@@ -168,9 +178,18 @@ $app->patch('/user', function (ServerRequestInterface $request, ResponseInterfac
         ->key('reset_password', Validator::boolType(), false);
 
     if (!$userValidator->validate($params)) {
+        $messages = [];
+
+        try {
+          $userValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 
@@ -208,8 +227,7 @@ $app->delete('/user/{id}', function (ServerRequestInterface $request, ResponseIn
 
     if (!Validator::numeric()
         ->length(1, 9)
-        ->validate($args['id'])
-    ) {
+        ->validate($args['id'])) {
         return jsonResponse($response, 400, [
             "code" => 400,
             "message" => "INVALID_PARAMETERS_PROVIDED"

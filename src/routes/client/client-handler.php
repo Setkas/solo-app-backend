@@ -126,9 +126,18 @@ $app->post('/client', function (ServerRequestInterface $request, ResponseInterfa
             ->length(1));
 
     if (!$clientValidator->validate($params)) {
+        $messages = [];
+
+        try {
+          $clientValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 
@@ -178,9 +187,18 @@ $app->patch('/client/{id}', function (ServerRequestInterface $request, ResponseI
         ->key('password', Validator::regex('/^([a-zA-Z0-9]{8,30})$/'), false);
 
     if (!$clientValidator->validate($params)) {
+        $messages = [];
+
+        try {
+          $clientValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 

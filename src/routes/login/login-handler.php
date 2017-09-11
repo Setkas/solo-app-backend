@@ -7,6 +7,7 @@ use Firebase\JWT\JWT;
 use Moment\Moment;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator;
 use Commons\Variables\LockKeys;
 
@@ -23,9 +24,18 @@ $app->post('/login', function (ServerRequestInterface $request, ResponseInterfac
             ->noWhitespace());
 
     if (!$loginValidator->validate($params)) {
+        $messages = [];
+
+        try {
+          $loginValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 
@@ -80,9 +90,18 @@ $app->post('/password-reset', function (ServerRequestInterface $request, Respons
         ->key('url', Validator::url());
 
     if (!$loginValidator->validate($params)) {
+        $messages = [];
+
+        try {
+          $loginValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 
@@ -124,9 +143,18 @@ $app->post('/password-update', function (ServerRequestInterface $request, Respon
         ->key('password', Validator::regex('/^([a-zA-Z0-9]{6,30})$/'));
 
     if (!$loginValidator->validate($params)) {
+        $messages = [];
+
+        try {
+          $loginValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 

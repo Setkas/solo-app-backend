@@ -67,9 +67,18 @@ $app->patch('/practice', function (ServerRequestInterface $request, ResponseInte
         ->key('language_id', Validator::numeric(), false);
 
     if (!$practiceValidator->validate($params)) {
+        $messages = [];
+
+        try {
+          $practiceValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 
@@ -108,9 +117,18 @@ $app->post('/practice', function (ServerRequestInterface $request, ResponseInter
             ->length(1));
 
     if (!$practiceValidator->validate($params)) {
+        $messages = [];
+
+        try {
+          $practiceValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 

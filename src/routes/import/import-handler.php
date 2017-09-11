@@ -4,6 +4,7 @@ require_once("import-controller.php");
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator;
 
 $app->get('/import/{id}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
@@ -63,9 +64,18 @@ $app->get('/import/{id}', function (ServerRequestInterface $request, ResponseInt
             ->length(1, 9)
             ->validate($args['id']) || !$importValidator->validate($params)
     ) {
+        $messages = [];
+
+        try {
+          $importValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 

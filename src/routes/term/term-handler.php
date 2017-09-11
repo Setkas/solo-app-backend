@@ -6,6 +6,7 @@ require_once("./src/routes/client/client-controller.php");
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use \Commons\Authorization\Auth;
+use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator;
 
 $app->get('/term/{clientId}/{id}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
@@ -145,9 +146,18 @@ $app->post('/term/{clientId}', function (ServerRequestInterface $request, Respon
             ->length(1, 9)
             ->validate($args['clientId'])
     ) {
+        $messages = [];
+
+        try {
+          $termValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 
@@ -221,9 +231,18 @@ $app->patch('/term/{clientId}/{id}', function (ServerRequestInterface $request, 
             ->length(1, 9)
             ->validate($args['clientId']) || !$termValidator->validate($params)
     ) {
+        $messages = [];
+
+        try {
+          $termValidator->assert($params);
+        } catch(NestedValidationException $exception) {
+          $messages = $exception->getMessages();
+        }
+
         return jsonResponse($response, 400, [
             "code" => 400,
-            "message" => "INVALID_PARAMETERS_PROVIDED"
+            "message" => "INVALID_PARAMETERS_PROVIDED",
+            "data" => $messages
         ]);
     }
 
