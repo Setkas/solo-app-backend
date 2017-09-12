@@ -39,6 +39,18 @@ $app->get('/user', function (ServerRequestInterface $request, ResponseInterface 
     ]);
   }
 
+  $user["code"] = (int) $user["code"];
+
+  $user["gender"] = (int) $user["gender"];
+
+  $user["id"] = (int) $user["id"];
+
+  $user["position_id"] = (int) $user["position_id"];
+
+  $user["practice_id"] = (int) $user["practice_id"];
+
+  $user["reset_password"] = (bool) $user["reset_password"];
+
   return jsonResponse($response, 200, $user);
 });
 
@@ -77,6 +89,20 @@ $app->get('/users', function (ServerRequestInterface $request, ResponseInterface
     ]);
   }
 
+  foreach ($users as $key => $user) {
+    $users[$key]["code"] = (int) $user["code"];
+
+    $users[$key]["gender"] = (int) $user["gender"];
+
+    $users[$key]["id"] = (int) $user["id"];
+
+    $users[$key]["position_id"] = (int) $user["position_id"];
+
+    $users[$key]["practice_id"] = (int) $user["practice_id"];
+
+    $users[$key]["reset_password"] = (bool) $user["reset_password"];
+  }
+
   return jsonResponse($response, 200, $users);
 });
 
@@ -101,7 +127,7 @@ $app->post('/user', function (ServerRequestInterface $request, ResponseInterface
 
   $userValidator = Validator::key('position_id', Validator::numeric()
     ->length(1, 9))
-    ->key('password', Validator::regex('/^([a-zA-Z0-9]{6,30})$/'))
+    ->key('password', Validator::regex('/^([a-zA-Z0-9]{6,30})$/'), false)
     ->key('title', Validator::stringType(), false)
     ->key('name', Validator::stringType())
     ->key('surname', Validator::stringType())
@@ -131,6 +157,12 @@ $app->post('/user', function (ServerRequestInterface $request, ResponseInterface
       'code' => 401,
       'message' => 'ACTION_NOT_PERMITTED'
     ]);
+  }
+
+  if (!isset($params["password"])) {
+    $params["password"] = $uc->generatePassword();
+
+    $params["reset_password"] = true;
   }
 
   if (!$uc->newUser($auth['practice'], $params)) {

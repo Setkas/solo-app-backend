@@ -6,11 +6,11 @@ class setupController {
   /**
    * Gets client data from database
    *
-   * @param $userId
+   * @param $practiceId
    * @param Medoo|null $db
    * @return bool|mixed
    */
-  public function loadSetup($userId, Medoo $db = null) {
+  public function loadSetup($practiceId, Medoo $db = null) {
     if ($db === null) {
       $db = databaseConnect();
 
@@ -20,7 +20,7 @@ class setupController {
     }
 
     $result = $db->select('setup', "*", [
-      "user_id" => $userId
+      "practice_id" => $practiceId
     ]);
 
     if ($result === false || count($result) === 0) {
@@ -39,18 +39,18 @@ class setupController {
   /**
    * Saves setup values for user
    *
-   * @param $userId
+   * @param $practiceId
    * @param array $data
    * @return bool
    */
-  public function saveSetup($userId, array $data) {
+  public function saveSetup($practiceId, array $data) {
     $db = databaseConnect();
 
     if ($db === false) {
       return false;
     }
 
-    $setup = $this->loadSetup($userId, $db);
+    $setup = $this->loadSetup($practiceId, $db);
     $update = [];
     $insert = [];
 
@@ -59,7 +59,7 @@ class setupController {
         $update[$k] = $v;
       } else {
         $insert[] = [
-          "user_id" => $userId,
+          "practice_id" => $practiceId,
           "name" => $k,
           "value" => $v
         ];
@@ -81,7 +81,7 @@ class setupController {
         $result = $db->update('setup', [
           "value" => $v
         ], [
-          "user_id" => $userId,
+          "practice_id" => $practiceId,
           "name" => $k
         ]);
 

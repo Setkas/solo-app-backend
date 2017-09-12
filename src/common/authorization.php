@@ -28,7 +28,7 @@ class Auth {
    * @param $user
    * @return array
    */
-  public static function createToken($practice, $user) {
+  public static function createToken($practice, $user, $authorization) {
     $moment = new Moment();
     $expireTime = $moment->addDays(1)
       ->format();
@@ -36,14 +36,16 @@ class Auth {
     $token = [
       "practice" => $practice,
       "user" => $user,
-      "expire" => $expireTime
+      "expire" => $expireTime,
+      "authorization" => $authorization
     ];
 
     $jwt = JWT::encode($token, Variables\LockKeys::$Jwt, 'HS256');
 
     return [
       "token" => $jwt,
-      "expire" => $expireTime
+      "expire" => $expireTime,
+      "authorization" => $authorization
     ];
   }
 
@@ -88,10 +90,10 @@ class Auth {
       "practice.id(id_practice)",
       "user.id(id_user)"
     ], [
-      "practice.id" => $tArray['practice'],
-      "user.id" => $tArray['user'],
-      "practice.deleted" => 0,
-      "user.deleted" => 0,
+      "practice.id" => (int) $tArray['practice'],
+      "user.id" => (int) $tArray['user'],
+      "practice.deleted" => null,
+      "user.deleted" => null,
       "LIMIT" => [
         0,
         1
@@ -103,8 +105,8 @@ class Auth {
     }
 
     return [
-      'user' => $tArray['user'],
-      'practice' => $tArray['practice']
+      'user' => (int) $tArray['user'],
+      'practice' => (int) $tArray['practice']
     ];
   }
 
@@ -113,7 +115,16 @@ class Auth {
    *
    * @return mixed
    */
-  public static function defaultAuthorization() {
+  public static function DefaultAuthorization() {
     return self::$authLevels[2];
+  }
+
+  /**
+   * Gets default main practice user authorization
+   *
+   * @return mixed
+   */
+  public static function PracticeUserAuthorization() {
+    return self::$authLevels[3];
   }
 }

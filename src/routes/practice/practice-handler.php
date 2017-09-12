@@ -31,10 +31,16 @@ $app->get('/practice', function (ServerRequestInterface $request, ResponseInterf
 
   if ($practice === false) {
     return jsonResponse($response, 404, [
-      'code' => 401,
+      'code' => 404,
       'message' => 'PRACTICE_NOT_FOUND'
     ]);
   }
+
+  $practice["id"] = (int) $practice["id"];
+
+  $practice["language_id"] = (int) $practice["language_id"];
+
+  $practice["valid_reminder"] = (bool) $practice["valid_reminder"];
 
   return jsonResponse($response, 200, $practice);
 });
@@ -59,10 +65,11 @@ $app->patch('/practice', function (ServerRequestInterface $request, ResponseInte
   $params = $request->getParsedBody();
 
   $practiceValidator = Validator::key('company', Validator::stringType()
-    ->length(4, 50))
+    ->length(4, 50), false)
     ->key('address', Validator::stringType(), false)
     ->key('phone', Validator::stringType(), false)
     ->key('contact_email', Validator::email(), false)
+    ->key('system_email', Validator::email(), false)
     ->key('webpages', Validator::url(), false)
     ->key('language_id', Validator::numeric(), false);
 

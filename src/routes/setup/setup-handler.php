@@ -25,10 +25,26 @@ $app->get('/setup', function (ServerRequestInterface $request, ResponseInterface
 
   $sc = new setupController();
 
-  $setup = $sc->loadSetup($auth['user']);
+  $setup = $sc->loadSetup($auth['practice']);
 
   if ($setup === false) {
     return jsonResponse($response, 200, []);
+  }
+
+  if (isset($setup['client_history'])) {
+    $setup['client_history'] = (int) $setup['client_history'];
+  }
+
+  if (isset($setup['client_reminder'])) {
+    $setup['client_reminder'] = (int) $setup['client_reminder'];
+  }
+
+  if (isset($setup['notes_history'])) {
+    $setup['notes_history'] = (int) $setup['notes_history'];
+  }
+
+  if (isset($setup['therapy_color'])) {
+    $setup['therapy_color'] = (int) $setup['therapy_color'];
   }
 
   return jsonResponse($response, 200, $setup);
@@ -55,7 +71,7 @@ $app->patch('/setup', function (ServerRequestInterface $request, ResponseInterfa
 
   $params = $request->getParsedBody();
 
-  $result = $sc->saveSetup($auth['user'], $params);
+  $result = $sc->saveSetup($auth['practice'], $params);
 
   if ($result === false) {
     return jsonResponse($response, 500, [

@@ -1,6 +1,7 @@
 <?php
 require_once("./src/routes/user/user-controller.php");
 
+use Commons\Authorization\Auth;
 use Medoo\Medoo;
 use Moment\Moment;
 use Commons\MysqlLock;
@@ -41,7 +42,7 @@ class practiceController {
 
     $result = $db->select('practice', "*", [
       "id" => $practiceId,
-      "deleted" => 0,
+      "deleted" => null,
       "LIMIT" => [
         0,
         1
@@ -199,7 +200,8 @@ class practiceController {
       'title' => $data['title'],
       'name' => $data['name'],
       'surname' => $data['surname'],
-      'gender' => $data['gender']
+      'gender' => $data['gender'],
+      'authorization' => Auth::PracticeUserAuthorization()
     ], $db, true);
 
     if ($result === false) {
@@ -259,7 +261,7 @@ class practiceController {
 
     $result = $db->update('practice', $editData, [
       'id' => $id,
-      'deleted' => 0
+      'deleted' => null
     ]);
 
     return ($result !== false);
@@ -286,7 +288,7 @@ class practiceController {
     }
 
     $result = $db->update('practice', [
-      'deleted' => 1
+      'deleted' => (new Moment())->format()
     ], [
       'id' => $practiceId
     ]);

@@ -3,6 +3,7 @@
 use Commons\Authorization\Auth;
 use Medoo\Medoo;
 use Commons\MysqlLock;
+use Moment\Moment;
 
 class userController {
   /**
@@ -33,7 +34,7 @@ class userController {
     $result = $db->select('user', "*", [
       "id" => $userId,
       "practice_id" => $practiceId,
-      "deleted" => 0,
+      "deleted" => null,
       "LIMIT" => [
         0,
         1
@@ -91,7 +92,7 @@ class userController {
 
     $result = $db->select('user', "*", [
       "practice_id" => $practiceId,
-      "deleted" => 0
+      "deleted" => null
     ]);
 
     if ($result === false || count($result) === 0) {
@@ -163,7 +164,9 @@ class userController {
       $data['title'] = "";
     }
 
-    $data['authorization'] = Auth::defaultAuthorization();
+    if (!isset($data['authorization'])) {
+      $data['authorization'] = Auth::DefaultAuthorization();
+    }
 
     $encodedData = $this->encodeData($data);
 
@@ -176,7 +179,8 @@ class userController {
       'e_name' => $encodedData['e_name'],
       'e_surname' => $encodedData['e_surname'],
       'gender' => $encodedData['gender'],
-      'authorization' => $encodedData["authorization"]
+      'authorization' => $encodedData["authorization"],
+      'reset_password' => (isset($encodedData["reset_password"]) ? $encodedData["reset_password"] : false)
     ]);
 
     return ($result !== false);
@@ -223,7 +227,7 @@ class userController {
     $result = $db->update('user', $editData, [
       'id' => $userId,
       'practice_id' => $practiceId,
-      'deleted' => 0
+      'deleted' => null
     ]);
 
     return ($result !== false);
@@ -244,7 +248,7 @@ class userController {
     }
 
     $result = $db->update('user', [
-      'deleted' => 1
+      'deleted' => (new Moment())->format()
     ], [
       'id' => $userId,
       'practice_id' => $practiceId
@@ -288,5 +292,19 @@ class userController {
       "name" => $user["name"],
       "surname" => $user["surname"]
     ];
+  }
+
+  public function generatePassword($length = 8) {
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+    $count = mb_strlen($chars);
+
+    for ($i = 0, $result = ''; $i < $length; $i++) {
+      $index = rand(0, $count - 1);
+
+      $result .= mb_substr($chars, $index, 1);
+    }
+
+    return $result;
   }
 }

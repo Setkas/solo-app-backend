@@ -28,7 +28,8 @@ class loginController {
     ], [
       "practice.id(id_practice)",
       "user.id(id_user)",
-      "valid"
+      "valid",
+      "authorization"
     ], [
       "practice.code[~]" => $practice,
       "user.code" => $user,
@@ -52,7 +53,7 @@ class loginController {
       return null;
     }
 
-    return Auth::createToken($result[0]["id_practice"], $result[0]["id_user"]);
+    return Auth::createToken($result[0]["id_practice"], $result[0]["id_user"], $result[0]["authorization"]);
   }
 
   /**
