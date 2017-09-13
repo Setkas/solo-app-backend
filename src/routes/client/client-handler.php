@@ -5,6 +5,7 @@ require_once("client-controller.php");
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use \Commons\Authorization\Auth;
+use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator;
 
 $app->get('/client/{id}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
@@ -43,6 +44,14 @@ $app->get('/client/{id}', function (ServerRequestInterface $request, ResponseInt
       'message' => 'CLIENT_LOAD_ERROR'
     ]);
   }
+
+  $client["id"] = (int) $client["id"];
+
+  $client["practice_id"] = (int) $client["practice_id"];
+
+  $client["gender"] = (int) $client["gender"];
+
+  $client["password"] = (bool) $client["password"];
 
   return jsonResponse($response, 200, $client);
 });
@@ -93,7 +102,19 @@ $app->get('/client-search', function (ServerRequestInterface $request, ResponseI
     $clients = array_slice($clients, 0, $params["limit"]);
   }
 
-  return jsonResponse($response, 200, $clients);
+  $result = [];
+
+  foreach ($clients as $key => $client) {
+    $result[] = [
+      "id" => (int) $client["id"],
+      "name" => $client["name"],
+      "surname" => $client["surname"],
+      "address" => $client["address"],
+      "birth_date" => $client["birth_date"]
+    ];
+  }
+
+  return jsonResponse($response, 200, $result);
 });
 
 $app->post('/client', function (ServerRequestInterface $request, ResponseInterface $response) {
@@ -142,7 +163,9 @@ $app->post('/client', function (ServerRequestInterface $request, ResponseInterfa
 
   $cc = new clientController();
 
-  if (!$cc->newClient($auth['practice'], $params)) {
+  $nc = $cc->newClient($auth['practice'], $params);
+
+  if (!$nc) {
     return jsonResponse($response, 500, [
       'code' => 500,
       'message' => 'CLIENT_CREATION_ERROR'
@@ -151,7 +174,8 @@ $app->post('/client', function (ServerRequestInterface $request, ResponseInterfa
 
   return jsonResponse($response, 200, [
     'code' => 200,
-    'message' => 'NEW_CLIENT_CREATED'
+    'message' => 'NEW_CLIENT_CREATED',
+    'data' => $nc
   ]);
 });
 

@@ -32,7 +32,7 @@ class clientController {
     $result = $db->select('client', "*", [
       "id" => $clientId,
       "practice_id" => $practiceId,
-      "deleted" => 0,
+      "deleted" => null,
       "LIMIT" => [
         0,
         1
@@ -77,7 +77,7 @@ class clientController {
 
     $result = $db->select('client', "*", [
       "practice_id" => $practiceId,
-      "deleted" => 0,
+      "deleted" => null,
       "keywords[~]" => $params
     ]);
 
@@ -90,12 +90,15 @@ class clientController {
 
     foreach ($clients as $c) {
       if (isset($exp[1])) {
-        if ((strtolower($c["name"]) === strtolower($exp[1]) || strtolower($c["surname"]) === strtolower($exp[0]))
-            || (strtolower($c["name"]) === strtolower($exp[0]) || strtolower($c["surname"]) === strtolower($exp[1]))) {
+        if ((strpos(strtolower($c["name"]), strtolower($exp[1])) !== false
+             && strpos(strtolower($c["surname"]), strtolower($exp[0])) !== false)
+            || (strpos(strtolower($c["name"]), strtolower($exp[0])) !== false
+                && strpos(strtolower($c["surname"]), strtolower($exp[1])) !== false)) {
           $mClients[] = $c;
         }
       } else {
-        if (strtolower($c["name"]) === strtolower($exp[0]) || strtolower($c["surname"]) === strtolower($exp[0])) {
+        if (strpos(strtolower($c["name"]), strtolower($exp[0])) !== false
+            || strpos(strtolower($c["surname"]), strtolower($exp[0])) !== false) {
           $mClients[] = $c;
         }
       }
@@ -159,12 +162,12 @@ class clientController {
       'e_surname' => $encodedData['e_surname'],
       'e_address' => $encodedData['e_address'],
       'e_phone' => $encodedData['e_surname'],
-      'birth_date' => $encodedData['gender'],
+      'birth_date' => $encodedData['birth_date'],
       'email' => $encodedData["email"],
       'gender' => $encodedData["gender"]
     ]);
 
-    return ($result !== false);
+    return ($result === false) ? false : (int) $db->id();
   }
 
   /**
@@ -208,14 +211,14 @@ class clientController {
     }
 
     if (isset($editData["e_name"]) && isset($editData["e_surname"])) {
-      $editData["keywords"] = strtoupper(substr($data["name"], 0, 1)) . "#"
+      $editData["keywords"] = "#" . strtoupper(substr($data["name"], 0, 1)) . "#"
                               . strtoupper(substr($data["surname"], 0, 1));
     }
 
     $result = $db->update('client', $editData, [
       'id' => $clientId,
       'practice_id' => $practiceId,
-      'deleted' => 0
+      'deleted' => null
     ]);
 
     return ($result !== false);
