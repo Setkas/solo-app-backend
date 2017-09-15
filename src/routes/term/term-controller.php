@@ -66,7 +66,7 @@ class termController {
       ]
     ]);
 
-    if ($terms === false || count($terms) === 0) {
+    if ($terms === false) {
       return false;
     }
 
@@ -102,24 +102,18 @@ class termController {
       'client_id' => $clientId,
       'user_id' => $userId,
       'date' => $data["date"],
-      'teeth_upper' => $data['teeth_upper'],
-      'teeth_lower' => $data['teeth_lower'],
-      'bleed_upper_inner' => $data['bleed_upper_outer'],
-      'bleed_upper_outer' => $data['bleed_upper_outer'],
-      'bleed_upper_middle' => $data['bleed_upper_middle'],
-      'bleed_lower_inner' => $data['bleed_lower_outer'],
-      'bleed_lower_outer' => $data['bleed_lower_outer'],
-      'bleed_lower_middle' => $data['bleed_lower_middle'],
-      'stix_upper' => $data["stix_upper"],
-      'stix_lower' => $data["stix_lower"],
-      'pass_upper' => $data["pass_upper"],
-      'pass_lower' => $data["pass_lower"],
-      'tartar' => $data["tartar"],
+      'teeth' => json_encode($data['teeth']),
+      'bleed_inner' => json_encode($data['bleed_inner']),
+      'bleed_outer' => json_encode($data['bleed_outer']),
+      'bleed_middle' => json_encode($data['bleed_middle']),
+      'stix' => json_encode($data["stix"]),
+      'pass' => json_encode($data["pass"]),
+      'tartar' => json_encode($data["tartar"]),
       'next_date' => $data["next_date"],
       'note' => $data["note"]
     ]);
 
-    return ($result !== false);
+    return ($result !== false) ? (int) $db->id() : false;
   }
 
   /**
@@ -140,18 +134,12 @@ class termController {
 
     $cols = [
       'date',
-      'teeth_upper',
-      'teeth_lower',
-      'bleed_upper_inner',
-      'bleed_upper_outer',
-      'bleed_upper_middle',
-      'bleed_lower_inner',
-      'bleed_lower_outer',
-      'bleed_lower_middle',
-      'stix_upper',
-      'stix_lower',
-      'pass_upper',
-      'pass_lower',
+      'teeth',
+      'bleed_inner',
+      'bleed_outer',
+      'bleed_middle',
+      'stix',
+      'pass',
       'tartar',
       'next_date',
       'note'
@@ -160,7 +148,11 @@ class termController {
 
     foreach ($cols as $col) {
       if (isset($data[$col])) {
-        $editData[$col] = $data[$col];
+        if ($col !== 'note' && $col !== 'next_date' && $col !== 'date') {
+          $editData[$col] = json_encode($data[$col]);
+        } else {
+          $editData[$col] = $data[$col];
+        }
       }
     }
 
@@ -184,21 +176,23 @@ class termController {
       "CURRENT" => 0
     ];
 
-    for ($i = 0; $i < 15; $i++) {
-      if (!(substr($term["teeth_upper"], $i, 1) === '0'
-            || (substr($term["teeth_upper"], $i, 1) === 'L' && substr($term["teeth_upper"], $i + 1, 1) === '0'))) {
-        $bob["MAX"]++;
+    for ($i = 0; $i < 32; $i++) {
+      $id = $i - 1;
 
-        if (substr($term["bleed_upper_middle"], $i, 1) === "1") {
-          $bob["CURRENT"]++;
-        }
+      if ($i < 7 || ($i > 15 && $i < 24)) {
+        $id = $i;
       }
 
-      if (!(substr($term["teeth_lower"], $i, 1) === '0'
-            || (substr($term["teeth_lower"], $i, 1) === 'L' && substr($term["teeth_lower"], $i + 1, 1) === '0'))) {
+      if ($id != 7
+          && $id !== 24
+          && !in_array($term["teeth"][$i], [
+          "L",
+          "0"
+        ])
+          && !in_array($term["teeth"][$id], ["0"])) {
         $bob["MAX"]++;
 
-        if (substr($term["bleed_lower_middle"], $i, 1) === "1") {
+        if ($term["bleed_middle"][$id] === true) {
           $bob["CURRENT"]++;
         }
       }
@@ -213,6 +207,20 @@ class termController {
     if ($term === false) {
       return false;
     }
+
+    $term["teeth"] = json_decode($term["teeth"]);
+
+    $term["bleed_inner"] = json_decode($term["bleed_inner"]);
+
+    $term["bleed_outer"] = json_decode($term["bleed_outer"]);
+
+    $term["bleed_middle"] = json_decode($term["bleed_middle"]);
+
+    $term["stix"] = json_decode($term["stix"]);
+
+    $term["pass"] = json_decode($term["pass"]);
+
+    $term["tartar"] = json_decode($term["tartar"]);
 
     $manager = new ImageManager(['driver' => 'gd']);
 
@@ -230,7 +238,10 @@ class termController {
     $stixPath = "./src/assets/stix/";
 
     for ($i = 0; $i < 16; $i++) {
-      if (substr($term["teeth_upper"], $i, 1) !== '0' && substr($term["teeth_upper"], $i, 1) !== 'L') {
+      if (!in_array($term["teeth"][$i], [
+        "0",
+        "L"
+      ])) {
         $fileName = $teethPath . "uj-" . $i . ".png";
 
         if (file_exists($fileName)) {
@@ -238,7 +249,10 @@ class termController {
         }
       }
 
-      if (substr($term["teeth_lower"], $i, 1) !== '0' && substr($term["teeth_lower"], $i, 1) !== 'L') {
+      if (!in_array($term["teeth"][16 + $i], [
+        "0",
+        "L"
+      ])) {
         $fileName = $teethPath . "lj-" . $i . ".png";
 
         if (file_exists($fileName)) {
@@ -248,18 +262,24 @@ class termController {
     }
 
     for ($i = 0; $i < 15; $i++) {
-      if (!(substr($term["teeth_upper"], $i, 1) === '0'
-            || (substr($term["teeth_upper"], $i, 1) === 'L' && substr($term["teeth_upper"], $i + 1, 1) === '0'))) {
-        $fileName = $stixPath . "stix-" . substr($term["stix_upper"], $i, 1) . ".png";
+      if (!in_array($term["teeth"][$i], [
+          "0",
+          "L"
+        ])
+          && !in_array($term["teeth"][$i + 1], ["0"])) {
+        $fileName = $stixPath . "stix-" . $term["stix"][$i] . ".png";
 
         if (file_exists($fileName)) {
           $image = $image->insert($fileName, 'top-left', ImageCoordinates::$stixUpperX[$i], ImageCoordinates::$stixUpperY[$i]);
         }
       }
 
-      if (!(substr($term["teeth_lower"], $i, 1) === '0'
-            || (substr($term["teeth_lower"], $i, 1) === 'L' && substr($term["teeth_upper"], $i + 1, 1) === '0'))) {
-        $fileName = $stixPath . "stix-" . substr($term["stix_lower"], $i, 1) . ".png";
+      if (!in_array($term["teeth"][16 + $i], [
+          "0",
+          "L"
+        ])
+          && !in_array($term["teeth"][16 + $i + 1], ["0"])) {
+        $fileName = $stixPath . "stix-" . $term["stix"][15 + $i] . ".png";
 
         if (file_exists($fileName)) {
           $image = $image->insert($fileName, 'top-left', ImageCoordinates::$stixLowerX[$i], ImageCoordinates::$stixLowerY[$i]);
@@ -293,8 +313,8 @@ class termController {
 
     $bob = $this->countBob($term);
 
-    $image = $image->text($client["name"] . " " . $client["surname"], $image->width() / 2, 50, $setFont50);
-    $image = $image->text($moment1->format("d. m. Y"), $image->width() / 2, 100, $setFont35);
+    $image = $image->text($client["surname"] . " " . $client["name"], $image->width() / 2, 50, $setFont50);
+    $image = $image->text($moment1->format("M d Y"), $image->width() / 2, 100, $setFont35);
 
     $image = $image->text('LEFT', $image->width() / 5, 675, $setFont25);
     $image = $image->text('RIGHT', $image->width() / 1.25, 675, $setFont25);

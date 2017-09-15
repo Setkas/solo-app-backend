@@ -49,6 +49,20 @@ $app->get('/term/{clientId}/{id}', function (ServerRequestInterface $request, Re
     ]);
   }
 
+  $term["teeth"] = json_decode($term["teeth"]);
+
+  $term["bleed_inner"] = json_decode($term["bleed_inner"]);
+
+  $term["bleed_outer"] = json_decode($term["bleed_outer"]);
+
+  $term["bleed_middle"] = json_decode($term["bleed_middle"]);
+
+  $term["stix"] = json_decode($term["stix"]);
+
+  $term["pass"] = json_decode($term["pass"]);
+
+  $term["tartar"] = json_decode($term["tartar"]);
+
   return jsonResponse($response, 200, $term);
 });
 
@@ -89,6 +103,22 @@ $app->get('/terms/{clientId}', function (ServerRequestInterface $request, Respon
     ]);
   }
 
+  foreach ($terms as $key => $term) {
+    $terms[$key]["teeth"] = json_decode($term["teeth"]);
+
+    $terms[$key]["bleed_inner"] = json_decode($term["bleed_inner"]);
+
+    $terms[$key]["bleed_outer"] = json_decode($term["bleed_outer"]);
+
+    $terms[$key]["bleed_middle"] = json_decode($term["bleed_middle"]);
+
+    $terms[$key]["stix"] = json_decode($term["stix"]);
+
+    $terms[$key]["pass"] = json_decode($term["pass"]);
+
+    $terms[$key]["tartar"] = json_decode($term["tartar"]);
+  }
+
   return jsonResponse($response, 200, $terms);
 });
 
@@ -112,32 +142,20 @@ $app->post('/term/{clientId}', function (ServerRequestInterface $request, Respon
   $params = $request->getParsedBody();
 
   $termValidator = Validator::key('date', Validator::date())
-    ->key('teeth_upper', Validator::stringType()
-      ->length(16))
-    ->key('teeth_lower', Validator::stringType()
-      ->length(16))
-    ->key('bleed_upper_inner', Validator::stringType()
-      ->length(16))
-    ->key('bleed_upper_outer', Validator::stringType()
-      ->length(16))
-    ->key('bleed_upper_middle', Validator::stringType()
-      ->length(15))
-    ->key('bleed_lower_inner', Validator::stringType()
-      ->length(16))
-    ->key('bleed_lower_outer', Validator::stringType()
-      ->length(16))
-    ->key('bleed_lower_middle', Validator::stringType()
-      ->length(15))
-    ->key('stix_upper', Validator::stringType()
-      ->length(15))
-    ->key('stix_lower', Validator::stringType()
-      ->length(15))
-    ->key('pass_upper', Validator::stringType()
-      ->length(15))
-    ->key('pass_lower', Validator::stringType()
-      ->length(15))
-    ->key('tartar', Validator::stringType()
-      ->length(2))
+    ->key('teeth', Validator::arrayType()
+      ->length(32, 32))
+    ->key('bleed_inner', Validator::arrayType()
+      ->length(32, 32))
+    ->key('bleed_outer', Validator::arrayType()
+      ->length(32, 32))
+    ->key('bleed_middle', Validator::arrayType()
+      ->length(30, 30))
+    ->key('stix', Validator::arrayType()
+      ->length(30, 30))
+    ->key('pass', Validator::arrayType()
+      ->length(30, 30))
+    ->key('tartar', Validator::arrayType()
+      ->length(4, 4))
     ->key('next_date', Validator::date())
     ->key('note', Validator::stringType(), false);
 
@@ -162,7 +180,9 @@ $app->post('/term/{clientId}', function (ServerRequestInterface $request, Respon
 
   $tc = new termController();
 
-  if (!$tc->newTerm($auth["user"], $args['clientId'], $params)) {
+  $lastId = $tc->newTerm($auth["user"], $args['clientId'], $params);
+
+  if (!$lastId) {
     return jsonResponse($response, 500, [
       'code' => 500,
       'message' => 'TERM_CREATION_ERROR'
@@ -171,7 +191,8 @@ $app->post('/term/{clientId}', function (ServerRequestInterface $request, Respon
 
   return jsonResponse($response, 200, [
     'code' => 200,
-    'message' => 'NEW_TERM_CREATED'
+    'message' => 'NEW_TERM_CREATED',
+    'data' => $lastId
   ]);
 });
 
@@ -195,32 +216,20 @@ $app->patch('/term/{clientId}/{id}', function (ServerRequestInterface $request, 
   $params = $request->getParsedBody();
 
   $termValidator = Validator::key('date', Validator::date(), false)
-    ->key('teeth_upper', Validator::stringType()
-      ->length(16), false)
-    ->key('teeth_lower', Validator::stringType()
-      ->length(16), false)
-    ->key('bleed_upper_inner', Validator::stringType()
-      ->length(16), false)
-    ->key('bleed_upper_outer', Validator::stringType()
-      ->length(16), false)
-    ->key('bleed_upper_middle', Validator::stringType()
-      ->length(15), false)
-    ->key('bleed_lower_inner', Validator::stringType()
-      ->length(16), false)
-    ->key('bleed_lower_outer', Validator::stringType()
-      ->length(16), false)
-    ->key('bleed_lower_middle', Validator::stringType()
-      ->length(15), false)
-    ->key('stix_upper', Validator::stringType()
-      ->length(15), false)
-    ->key('stix_lower', Validator::stringType()
-      ->length(15), false)
-    ->key('pass_upper', Validator::stringType()
-      ->length(15), false)
-    ->key('pass_lower', Validator::stringType()
-      ->length(15), false)
-    ->key('tartar', Validator::stringType()
-      ->length(2), false)
+    ->key('teeth', Validator::arrayType()
+      ->length(32, 32), false)
+    ->key('bleed_inner', Validator::arrayType()
+      ->length(32, 32), false)
+    ->key('bleed_outer', Validator::arrayType()
+      ->length(32, 32), false)
+    ->key('bleed_middle', Validator::arrayType()
+      ->length(30, 30), false)
+    ->key('stix', Validator::arrayType()
+      ->length(30, 30), false)
+    ->key('pass', Validator::arrayType()
+      ->length(30, 30), false)
+    ->key('tartar', Validator::arrayType()
+      ->length(4, 4), false)
     ->key('next_date', Validator::date(), false)
     ->key('note', Validator::stringType(), false);
 
