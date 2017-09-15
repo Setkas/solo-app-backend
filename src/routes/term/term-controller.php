@@ -176,20 +176,17 @@ class termController {
       "CURRENT" => 0
     ];
 
-    for ($i = 0; $i < 32; $i++) {
+    forEach ($term["teeth"] as $i => $value) {
       $id = $i - 1;
+      $next = ($id < 16) ? $id - 1 : $id + 1;
 
-      if ($i < 7 || ($i > 15 && $i < 24)) {
-        $id = $i;
-      }
-
-      if ($id != 7
-          && $id !== 24
-          && !in_array($term["teeth"][$i], [
+      if ($i > 0
+          && $i < 31
+          && !in_array($term["teeth"][$id], [
           "L",
           "0"
         ])
-          && !in_array($term["teeth"][$id], ["0"])) {
+          && !in_array($term["teeth"][$next], ["0"])) {
         $bob["MAX"]++;
 
         if ($term["bleed_middle"][$id] === true) {

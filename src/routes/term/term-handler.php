@@ -155,7 +155,7 @@ $app->post('/term/{clientId}', function (ServerRequestInterface $request, Respon
     ->key('pass', Validator::arrayType()
       ->length(30, 30))
     ->key('tartar', Validator::arrayType()
-      ->length(4, 4))
+      ->length(2, 2))
     ->key('next_date', Validator::date())
     ->key('note', Validator::stringType(), false);
 
@@ -229,7 +229,7 @@ $app->patch('/term/{clientId}/{id}', function (ServerRequestInterface $request, 
     ->key('pass', Validator::arrayType()
       ->length(30, 30), false)
     ->key('tartar', Validator::arrayType()
-      ->length(4, 4), false)
+      ->length(2, 2), false)
     ->key('next_date', Validator::date(), false)
     ->key('note', Validator::stringType(), false);
 
