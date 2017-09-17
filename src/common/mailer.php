@@ -69,8 +69,8 @@ class mailer {
     $mail->isHTML(true);
 
     //Set sender
-    //$mail->setFrom($this->sender["email"], $this->sender["name"]);
-    //$mail->addReplyTo($this->sender["email"], $this->sender["name"]);
+    $mail->setFrom($this->sender["email"], $this->sender["name"]);
+    $mail->addReplyTo($this->sender["email"], $this->sender["name"]);
     //$mail->addBCC($this->sender["email"], $this->sender["name"]);
 
     //Set receiver
@@ -83,17 +83,6 @@ class mailer {
     //Set content
     $mail->Subject = $subject;
     $mail->Body = $body;
-
-    //Debug
-    $mail->setFrom("Subdragon@seznam.cz", $this->sender["name"]);
-    $mail->isSMTP();
-    $mail->SMTPDebug = 0;
-    $mail->Debugoutput = 'html';
-    $mail->Host = "smtp.seznam.cz";
-    $mail->Port = 25;
-    $mail->SMTPAuth = true;
-    $mail->Username = "Subdragon@seznam.cz";
-    $mail->Password = "Allowme2";
 
     //Send email
     return ($mail->send() !== false);
@@ -124,8 +113,8 @@ class mailer {
     $mail->isHTML(true);
 
     //Set sender
-    //$mail->setFrom($this->sender["email"], $this->sender["name"]);
-    //$mail->addReplyTo($this->sender["email"], $this->sender["name"]);
+    $mail->setFrom($this->sender["email"], $this->sender["name"]);
+    $mail->addReplyTo($this->sender["email"], $this->sender["name"]);
     //$mail->addBCC($this->sender["email"], $this->sender["name"]);
 
     //Set receiver
@@ -141,17 +130,6 @@ class mailer {
 
     //Add file attachment
     $mail->AddEmbeddedImage($file, basename($file));
-
-    //Debug
-    $mail->setFrom("Subdragon@seznam.cz", $this->sender["name"]);
-    $mail->isSMTP();
-    $mail->SMTPDebug = 0;
-    $mail->Debugoutput = 'html';
-    $mail->Host = "smtp.seznam.cz";
-    $mail->Port = 25;
-    $mail->SMTPAuth = true;
-    $mail->Username = "Subdragon@seznam.cz";
-    $mail->Password = "Allowme2";
 
     //Send email
     return ($mail->send() !== false);

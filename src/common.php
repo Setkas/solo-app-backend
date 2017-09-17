@@ -16,7 +16,8 @@ function databaseConnect() {
       'server' => Variables\MysqlCredentials::$Host,
       'username' => Variables\MysqlCredentials::$User,
       'password' => Variables\MysqlCredentials::$Password,
-      'charset' => 'utf8'
+      'charset' => 'utf8',
+      'prefix' => 'sa_',
     ]);
   } catch (Exception $exception) {
     return false;
