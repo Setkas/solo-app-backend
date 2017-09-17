@@ -21,7 +21,11 @@ function jsonResponse(ResponseInterface $response, $code = 200, array $data = nu
   if ($data === null) {
     return $newResponse;
   } else {
-    return $newResponse->write(json_encode($data, JSON_UNESCAPED_UNICODE));
+    $encoded = json_encode($data, JSON_UNESCAPED_UNICODE);
+
+    $newResponse = $newResponse->withHeader('Content-Length', strlen($encoded));
+
+    return $newResponse->write($encoded);
   }
 }
 

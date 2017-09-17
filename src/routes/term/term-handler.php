@@ -297,16 +297,19 @@ $app->get('/term-image/{clientId}/{id}', function (ServerRequestInterface $reque
   $image = $tc->generateImage($args['clientId'], $args['id'], $client);
 
   if ($image === false) {
-    $handler = $this->notFoundHandler;
-
-    return $handler($request, $response);
+    return jsonResponse($response, 400, [
+      "code" => 404,
+      "message" => "TERM_IMAGE_LOAD_FAILED"
+    ]);
   }
 
-  return $response->withHeader('Content-Type', 'image/png')
-    ->withHeader('Access-Control-Allow-Origin', '*')
-    ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-    ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-    ->write($image);
+  $base64 = 'data:image/png;base64,' . base64_encode($image);
+
+  return jsonResponse($response, 200, [
+    'code' => 200,
+    'message' => 'TERM_IMAGE_LOADED',
+    'data' => $base64
+  ]);
 });
 
 $app->post('/term-email/{clientId}/{id}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
