@@ -69,8 +69,8 @@ class mailer {
     $mail->isHTML(true);
 
     //Set sender
-    $mail->setFrom($this->sender["email"], $this->sender["name"]);
-    $mail->addReplyTo($this->sender["email"], $this->sender["name"]);
+    //$mail->setFrom($this->sender["email"], $this->sender["name"]);
+    //$mail->addReplyTo($this->sender["email"], $this->sender["name"]);
     //$mail->addBCC($this->sender["email"], $this->sender["name"]);
 
     //Set receiver
@@ -83,6 +83,17 @@ class mailer {
     //Set content
     $mail->Subject = $subject;
     $mail->Body = $body;
+
+    //Debug
+    $mail->setFrom("Subdragon@seznam.cz", $this->sender["name"]);
+    $mail->isSMTP();
+    $mail->SMTPDebug = 0;
+    $mail->Debugoutput = 'html';
+    $mail->Host = "smtp.seznam.cz";
+    $mail->Port = 25;
+    $mail->SMTPAuth = true;
+    $mail->Username = "Subdragon@seznam.cz";
+    $mail->Password = "Allowme2";
 
     //Send email
     return ($mail->send() !== false);
@@ -92,19 +103,29 @@ class mailer {
    * Send email with additional file
    *
    * @param $to
+   * @param $template
    * @param $file
    * @param $subject
-   * @param string $body
+   * @param $variables
    * @return bool
    */
-  public function sendFile($to, $file, $subject, $body = "") {
+  public function sendFile($to, $template, $file, $subject, array $variables = []) {
+    $variables["file"] = basename($file);
+
+    //Generate template
+    try {
+      $body = self::$TemplateEngine->get($this->templatePath . $template . $this->templateExt, $variables);
+    } catch (Exception $e) {
+      return false;
+    }
+
     //Set mailer options
     $mail = new PHPMailer();
-    $mail->isHTML(false);
+    $mail->isHTML(true);
 
     //Set sender
-    $mail->setFrom($this->sender["email"], $this->sender["name"]);
-    $mail->addReplyTo($this->sender["email"], $this->sender["name"]);
+    //$mail->setFrom($this->sender["email"], $this->sender["name"]);
+    //$mail->addReplyTo($this->sender["email"], $this->sender["name"]);
     //$mail->addBCC($this->sender["email"], $this->sender["name"]);
 
     //Set receiver
@@ -114,12 +135,23 @@ class mailer {
       $mail->addAddress($to);
     }
 
-    //Add file attachment
-    $mail->addAttachment($file, basename($file));
-
     //Set content
     $mail->Subject = $subject;
     $mail->Body = $body;
+
+    //Add file attachment
+    $mail->AddEmbeddedImage($file, basename($file));
+
+    //Debug
+    $mail->setFrom("Subdragon@seznam.cz", $this->sender["name"]);
+    $mail->isSMTP();
+    $mail->SMTPDebug = 0;
+    $mail->Debugoutput = 'html';
+    $mail->Host = "smtp.seznam.cz";
+    $mail->Port = 25;
+    $mail->SMTPAuth = true;
+    $mail->Username = "Subdragon@seznam.cz";
+    $mail->Password = "Allowme2";
 
     //Send email
     return ($mail->send() !== false);

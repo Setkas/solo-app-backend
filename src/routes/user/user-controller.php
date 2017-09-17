@@ -83,17 +83,22 @@ class userController {
    * @param $practiceId
    * @return array|bool
    */
-  public function loadUsers($practiceId) {
+  public function loadUsers($practiceId, $deleted = true) {
     $db = databaseConnect();
 
     if ($db === false) {
       return false;
     }
 
-    $result = $db->select('user', "*", [
-      "practice_id" => $practiceId,
-      "deleted" => null
-    ]);
+    $where = [
+      "practice_id" => $practiceId
+    ];
+
+    if($deleted) {
+      $where["deleted"] = null;
+    }
+
+    $result = $db->select('user', "*", $where);
 
     if ($result === false || count($result) === 0) {
       return false;
@@ -149,7 +154,7 @@ class userController {
     }
 
     if ($first === false) {
-      $users = $this->loadUsers($practiceId);
+      $users = $this->loadUsers($practiceId, false);
 
       if ($users === false) {
         return false;
@@ -183,7 +188,7 @@ class userController {
       'reset_password' => (isset($encodedData["reset_password"]) ? $encodedData["reset_password"] : false)
     ]);
 
-    return ($result !== false);
+    return ($result !== false) ? $encodedData["code"] : false;
   }
 
   /**

@@ -278,6 +278,7 @@ class clientController {
     return [
       "name" => $client["name"],
       "surname" => $client["surname"],
+      "gender" => $client["gender"],
       "birth_date" => $client["birth_date"],
       "email" => $client["email"]
     ];

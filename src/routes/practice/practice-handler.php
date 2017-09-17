@@ -141,14 +141,30 @@ $app->post('/practice', function (ServerRequestInterface $request, ResponseInter
 
   $pc = new practiceController();
 
-  if (!$pc->newPractice($params)) {
+  $mailer = new Commons\Mailer\mailer();
+
+  $code = $pc->newPractice($params);
+
+  if ($code == false
+      || !$mailer->sendMail($params['contact_email'], "new_practice", "Registration was Successful", [
+      "officeCode" => $code,
+      "userNumber" => 1,
+      "company" => $params["company"],
+      "address" => $params["address"],
+      "language" => $params["language_id"],
+      "phone" => $params["phone"],
+      "email" => $params["contact_email"],
+      "webpages" => $params["webpages"],
+      "title" => $params["title"],
+      "name" => $params["name"],
+      "surname" => $params["surname"],
+      "position" => $params["position_id"]
+    ])) {
     return jsonResponse($response, 500, [
       'code' => 500,
       'message' => 'PRACTICE_CREATION_ERROR'
     ]);
   }
-
-  //@TODO: Send email about practice creation
 
   return jsonResponse($response, 200, [
     'code' => 200,

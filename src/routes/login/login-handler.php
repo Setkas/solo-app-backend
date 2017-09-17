@@ -118,21 +118,34 @@ $app->post('/password-reset', function (ServerRequestInterface $request, Respons
 
   $token = $lc->resetPassword($practiceUser["id_practice"], $practiceUser["id_user"]);
 
-  if ($token === false) {
+  $pc = new practiceController();
+
+  $uc = new userController();
+
+  $practice = $pc->loadPractice($practiceUser["id_practice"]);
+
+  $user = $uc->loadUser($practiceUser["id_practice"], $practiceUser["id_user"]);
+
+  $mailer = new \Commons\Mailer\mailer();
+
+  $resetUrl = $params['url'] . "#token=" . $token['jwt'];
+
+  if ($token === false
+      || !$mailer->sendMail($practice['contact_email'], "reset_password", "New Password Request", [
+      "url" => $resetUrl,
+      "title" => $user["title"],
+      "name" => $user["name"],
+      "surname" => $user["surname"]
+    ])) {
     return jsonResponse($response, 500, [
       "code" => 500,
       "message" => "PASSWORD_RESET_FAILED"
     ]);
   }
 
-  $resetUrl = $params['url'] . "#token=" . $token['jwt'];
-
-  //@TODO: Send email about password reset
-
   return jsonResponse($response, 200, [
     'code' => 200,
-    'message' => 'PASSWORD_RESET_SUCCESS',
-    'data' => $resetUrl
+    'message' => 'PASSWORD_RESET_SUCCESS'
   ]);
 });
 

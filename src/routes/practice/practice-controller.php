@@ -212,7 +212,7 @@ class practiceController {
       return false;
     }
 
-    return true;
+    return ($result !== false) ? $code : false;
   }
 
   /**

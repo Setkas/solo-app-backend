@@ -198,7 +198,7 @@ class termController {
     return $bob;
   }
 
-  public function generateImage($clientId, $termId, $client) {
+  public function generateImage($clientId, $termId, $client, $path = false) {
     $term = $this->loadTerm($clientId, $termId);
 
     if ($term === false) {
@@ -321,6 +321,14 @@ class termController {
     $image = $image->text($moment->format("d. m. Y"), $image->width() / 2, 1160, $setFont35);
     $image = $image->text("BOB: " . $bob["CURRENT"] . "/" . $bob["MAX"], $image->width() / 2, 1220, $setFont50);
 
-    return $image->response('png');
+    if ($path) {
+      $path = './temp/stix-' . $clientId . '-' . $moment->format("Y-m-d") . '.png';
+
+      $image->save($path);
+
+      return $path;
+    } else {
+      return $image->response('png');
+    }
   }
 }

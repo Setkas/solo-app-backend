@@ -313,6 +313,22 @@ $app->get('/term-image/{clientId}/{id}', function (ServerRequestInterface $reque
 });
 
 $app->post('/term-email/{clientId}/{id}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
+  if (!$request->hasHeader('Authorization')) {
+    return jsonResponse($response, 401, [
+      'code' => 401,
+      'message' => 'INVALID_ACCESS'
+    ]);
+  }
+
+  $auth = Auth::checkToken($request->getHeader('Authorization')[0]);
+
+  if (!$auth) {
+    return jsonResponse($response, 401, [
+      'code' => 401,
+      'message' => 'ACCESS_TOKEN_INVALID'
+    ]);
+  }
+
   if (!Validator::numeric()
       ->length(1, 9)
       ->validate($args['id'])
@@ -338,16 +354,32 @@ $app->post('/term-email/{clientId}/{id}', function (ServerRequestInterface $requ
 
   $tc = new termController();
 
-  $image = $tc->generateImage($args['clientId'], $args['id'], $client);
+  $pc = new practiceController();
 
-  if ($image === false) {
+  $uc = new userController();
+
+  $mailer = new \Commons\Mailer\mailer();
+
+  $image = $tc->generateImage($args['clientId'], $args['id'], $client, true);
+
+  $user = $uc->loadUser($auth['practice'], $auth["user"]);
+
+  $practice = $pc->loadPractice($auth['practice']);
+
+  if ($image === false || !$mailer->sendFile($client['email'], "client_pass", $image, "Client's Pass", [
+      "clientName" => $client["surname"],
+      "clientGender" => $client["gender"],
+      "title" => $user["title"],
+      "name" => $user["name"],
+      "surname" => $user["surname"],
+      "phone" => $practice["phone"],
+      "email" => $practice["contact_email"]
+    ])) {
     return jsonResponse($response, 500, [
       'code' => 500,
       'message' => 'TERM_EMAIL_FAILED'
     ]);
   }
-
-  //@TODO: Send email with image to client
 
   return jsonResponse($response, 200, [
     'code' => 200,

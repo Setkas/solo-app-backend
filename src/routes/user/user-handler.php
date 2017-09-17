@@ -2,12 +2,9 @@
 
 require_once("user-controller.php");
 
-use Firebase\JWT\JWT;
-use Moment\Moment;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use \Commons\Authorization\Auth;
-use \Commons\Variables;
 use Respect\Validation\Exceptions\NestedValidationException;
 use Respect\Validation\Validator;
 
@@ -152,6 +149,8 @@ $app->post('/user', function (ServerRequestInterface $request, ResponseInterface
 
   $uc = new userController();
 
+  $pc = new practiceController();
+
   if (!$uc->isMasterUser($auth['user'])) {
     return jsonResponse($response, 401, [
       'code' => 401,
@@ -165,14 +164,22 @@ $app->post('/user', function (ServerRequestInterface $request, ResponseInterface
     $params["reset_password"] = true;
   }
 
-  if (!$uc->newUser($auth['practice'], $params)) {
+  $practice = $pc->loadPractice($auth['practice']);
+
+  $mailer = new \Commons\Mailer\mailer();
+
+  $userCode = $uc->newUser($auth['practice'], $params);
+
+  if ($practice == false || $userCode != false
+      || !$mailer->sendMail($practice['contact_email'], "new_user", "New User Created", [
+      "password" => $params["password"],
+      "userNumber" => $userCode
+    ])) {
     return jsonResponse($response, 500, [
       'code' => 500,
       'message' => 'USER_CREATION_ERROR'
     ]);
   }
-
-  //@TODO: Send email about new user creation
 
   return jsonResponse($response, 200, [
     'code' => 200,
